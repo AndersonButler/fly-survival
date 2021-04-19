@@ -133,13 +133,15 @@ library(survival)
 
 fit = surv_fit(Surv(Days,Dead1Excluded0) ~ Treatment, data = df.final)
 
+legend_labels = as.factor(unique(df.final$Treatment))
+
 ggsurvplot(fit, data = df.final,
            title = "Survival Curves",
            conf.int = TRUE,
            pval = TRUE, pval.method = TRUE,    # Add p-value &  method name
            surv.median.line = "hv",            # Add median survival lines
            legend.title = "TREATMENT",               # Change legend titles
-           legend.labs = c("DMSO", "DRUG"),  # Change legend labels
+           legend.labs = legend_labels,  # Change legend labels
            palette = "Pastel1",                    # Use JCO journal color palette
            risk.table = F,                  # Add No at risk table
            cumevents = F,                   # Add cumulative No of events table
@@ -156,13 +158,15 @@ library(survival)
 
 fit = surv_fit(Surv(Days,Dead1Excluded0) ~ Genotype, data = df.final)
 
+legend_labels = as.factor(unique(df.final$Genotype))
+
 ggsurvplot(fit, data = df.final,
            title = "Survival Curves",
            conf.int = TRUE,
            pval = TRUE, pval.method = TRUE,    # Add p-value &  method name
            surv.median.line = "hv",            # Add median survival lines
            legend.title = "GENOTYPE",               # Change legend titles
-           legend.labs = c("Control", "Tdp43"),  # Change legend labels
+           legend.labs = legend_labels,  # Change legend labels
            palette = "Pastel1",                    # Use JCO journal color palette
            risk.table = F,                  # Add No at risk table
            cumevents = F,                   # Add cumulative No of events table
