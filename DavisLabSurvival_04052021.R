@@ -63,13 +63,14 @@ df.temp = data.frame(Vial = numeric(0), Days = numeric(0),Dead1Excluded0 = numer
 #Loop to generate individual entries for each dead fly
 for (x in 1:length(survival_data_raw$Vial)) {
   for (y in 4:ncol(df.ndead)) {
-    if (df.ndead[x,y] > 0)
-      myvector = c(Vial = df.ndead$Vial[x], Genotype = survival_key_raw$Genotype[x], Treatment = survival_key_raw$Treatment[x], Days = (df.age[x,y]), Dead1Excluded0 = 1) #vector of dead fly info
-      df.temp = as.data.frame(myvector) # vector as a df
+    if (df.ndead[x,y] > 0) {
+      myvector1 = c(Vial = df.ndead$Vial[x], Genotype = survival_key_raw$Genotype[x], Treatment = survival_key_raw$Treatment[x], Days = (df.age[x,y]), Dead1Excluded0 = 1) #vector of dead fly info
+      df.temp = as.data.frame(myvector1) # vector as a df
       colnames(df.temp)[4] = "Days"
       ndead = as.numeric(df.ndead[x,y])
       df.temp = df.temp[rep(seq_len(nrow(df.temp)), each = ndead), ] # Repeat the row until you have 1 row for each dead fly (in that vial, at that timepoint)
       df.final = rbind(df.final,df.temp)
+    }
   }
 }
 
@@ -77,13 +78,14 @@ for (x in 1:length(survival_data_raw$Vial)) {
 
 for (x in 1:length(survival_data_raw$Vial)) {
   for (y in 4:ncol(df.ndead)) {
-    if (df.nexcluded[x,y] > 0)
-      myvector = c(Vial = df.nexcluded$Vial[x], Genotype = survival_key_raw$Genotype[x], Treatment = survival_key_raw$Treatment[x], Days = (df.age[x,y]), Dead1Excluded0 = 0) #vector of left-censored fly info
-      df.temp = as.data.frame(myvector) # vector as a df
+    if (df.nexcluded[x,y] > 0){
+      myvector2 = c(Vial = df.nexcluded$Vial[x], Genotype = survival_key_raw$Genotype[x], Treatment = survival_key_raw$Treatment[x], Days = (df.age[x,y]), Dead1Excluded0 = 0) #vector of left-censored fly info
+      df.temp = as.data.frame(myvector2) # vector as a df
       colnames(df.temp)[4] = "Days"
       nexcluded = as.numeric(df.nexcluded[x,y])
       df.temp = df.temp[rep(seq_len(nrow(df.temp)), each = nexcluded), ] # Repeat the row until you have 1 row for each dead fly (in that vial, at that timepoint)
       df.final = rbind(df.final,df.temp)
+    }
   }
 }
 
@@ -92,8 +94,8 @@ for (x in 1:length(survival_data_raw$Vial)) {
   if (colnames(df.survivors[2]) == "survivors_in_vial") {
   if (is.na(df.survivors$survivors_in_vial[x])=="FALSE") {
     if (df.survivors[x,2] > 0) {
-      myvector = as.list(c(Vial = df.survivors$Vial[x], Genotype = survival_key_raw$Genotype[x], Treatment = survival_key_raw$Treatment[x], Days = as.double(df.survivors$age_at_expt_end[x]), Dead1Excluded0 = 0)) #right-censored
-      df.temp = as.data.frame(myvector) # vector as a df
+      myvector3 = as.list(c(Vial = df.survivors$Vial[x], Genotype = survival_key_raw$Genotype[x], Treatment = survival_key_raw$Treatment[x], Days = as.double(df.survivors$age_at_expt_end[x]), Dead1Excluded0 = 0)) #right-censored
+      df.temp = as.data.frame(myvector3) # vector as a df
       df.temp$Days = as.numeric(df.temp$Days)
       df.temp$Dead1Excluded0 = as.numeric(df.temp$Dead1Excluded0)
       n_right_censored = as.numeric(df.survivors[x,2])
@@ -106,8 +108,8 @@ for (x in 1:length(survival_data_raw$Vial)) {
     if (survivors_so_far > 0) {
       most_recent_age_col = ncol(df.age) # for calculating age below
       age_so_far = as.numeric(df.age[x,most_recent_age_col])
-      myvector = as.list(c(Vial = df.survivors$Vial[x], Genotype = survival_key_raw$Genotype[x], Treatment = survival_key_raw$Treatment[x], Days = age_so_far, Dead1Excluded0 = 0)) #right-censored
-      df.temp = as.data.frame(myvector)
+      myvector4 = as.list(c(Vial = df.survivors$Vial[x], Genotype = survival_key_raw$Genotype[x], Treatment = survival_key_raw$Treatment[x], Days = age_so_far, Dead1Excluded0 = 0)) #right-censored
+      df.temp = as.data.frame(myvector4)
       df.temp$Days = as.numeric(df.temp$Days)
       df.temp$Dead1Excluded0 = as.numeric(df.temp$Dead1Excluded0)
       n_right_censored = as.numeric(survivors_so_far)
