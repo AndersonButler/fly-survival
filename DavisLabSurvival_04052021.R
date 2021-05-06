@@ -125,7 +125,7 @@ my_file_name = paste("SurvivalAnalysisTable_",run_day, sep="")
 my_file_name = paste(my_file_name,".csv", sep="")
 write.csv(df.final,my_file_name)
 
-
+# First Survival Curve
 ## -------------------------------------------------------------------------------------------------
 library(dplyr)
 library(survminer)
@@ -136,7 +136,7 @@ fit = surv_fit(Surv(Days,Dead1Excluded0) ~ Treatment, data = df.final)
 legend_labels = as.factor(unique(df.final$Treatment))
 
 ggsurvplot(fit, data = df.final,
-           title = "Survival Curves",
+           title = "Survival Curves: Treatment",
            conf.int = TRUE,
            pval = TRUE, pval.method = TRUE,    # Add p-value &  method name
            surv.median.line = "hv",            # Add median survival lines
@@ -161,7 +161,7 @@ fit = surv_fit(Surv(Days,Dead1Excluded0) ~ Genotype, data = df.final)
 legend_labels = as.factor(unique(df.final$Genotype))
 
 ggsurvplot(fit, data = df.final,
-           title = "Survival Curves",
+           title = "Survival Curves: Genotype",
            conf.int = TRUE,
            pval = TRUE, pval.method = TRUE,    # Add p-value &  method name
            surv.median.line = "hv",            # Add median survival lines
