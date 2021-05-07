@@ -198,6 +198,11 @@ for (i in seq_along(summ)) {
   text(0, 100 - i*4, pos=4, summ[i], cex = 0.5, family='mono')
 }
 
+steve = plot(NULL, xaxt='n', yaxt='n', bty='n', ylab='', xlab='', xlim=c(0, 100), ylim=c(0, 100), xaxs = 'i', yaxs = 'i')
+steve = steve + for (i in seq_along(summ)) {
+            text(0, 100 - i*4, pos=4, summ[i], cex = 0.5, family='mono')
+            }
+
 
 ## -------------------------------------------------------------------------------------------------
 # Data preparation and computing cox model

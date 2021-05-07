@@ -10,6 +10,9 @@ library(readr)
 library(readxl)
 library(tidyverse)
 library(cellranger)
+library(ggplot2)
+library(listviewer)
+library(reactR)
 
 
 #choices <- "choice 1, some other choice, and another one"
@@ -41,15 +44,18 @@ ui <- fluidPage(
             p('If you want a sample file to upload,',
               'you can first download the sample data and key files', 
               'and then try uploading them',
-              a(href = 'mtcars.csv', 'mtcars.csv'), 'or',
-              a(href = 'pressure.tsv', 'pressure.tsv'),
+              a(href = 'https://github.com/AndersonButler/fly-survival/blob/9df0fdfe61b8e16df8c8c1243f40c931ea05492f/rawdata_template_survival.xlsx', 'data_template.xlsx'), 'or',
+              a(href = 'https://github.com/AndersonButler/fly-survival/blob/9df0fdfe61b8e16df8c8c1243f40c931ea05492f/key_template_survival.xlsx', 'key_template_survival.xlsx'),
               'files, and then try uploading them.'),
         ),
         # Show a plot of the generated distribution
         mainPanel(
             tableOutput("raw_table"),
             plotOutput("SurvivalPlotTreatment"),
-            plotOutput("SurvivalPlotGenotype")
+            plotOutput("SurvivalPlotGenotype"),
+            reactjsonOutput( "rjed" ),
+            #plotOutput("PairwiseComparisonsTreatment"),
+            #plotOutput("PairwiseComparisonsGenotype")
         )
         )
 )
@@ -207,7 +213,36 @@ server <- function(input, output) {
                    tables.y.text = FALSE               # Hide tables y axis text
         ))
         
+        # Survival Math: Pairwise Comparisons for More Than Two Treatments
+        res <- pairwise_survdiff(Surv(Days, Dead1Excluded0) ~ Treatment,
+                                 data = df.final)
         
+        summary = capture.output(res)
+        pairwise_summary_plot_treatment = plot(NULL, xaxt='n', yaxt='n', bty='n', ylab='', xlab='', xlim=c(0, 100), ylim=c(0, 100), xaxs = 'i', yaxs = 'i')
+        pairwise_summary_plot_treatment = pairwise_summary_plot_treatment + for (i in seq_along(summary)) {
+                text(0, 100 - i*4, pos=4, summ[i], cex = 0.5, family='mono')
+            }
+        
+        output$PairwiseComparisonsTreatment = renderPlot(pairwise_summary_plot_treatment)
+ 
+        
+
+        res2 <- pairwise_survdiff(Surv(Days, Dead1Excluded0) ~ Genotype,
+                                 data = df.final)
+        summary2= capture.output(res2)
+        
+        pairwise_summary_plot_genotype = plot(NULL, xaxt='n', yaxt='n', bty='n', ylab='', xlab='', xlim=c(0, 100), ylim=c(0, 100), xaxs = 'i', yaxs = 'i')
+        pairwise_summary_plot_genotype2 = pairwise_summary_plot_genotype + for (i in seq_along(summary2)) {
+            text(0, 100 - i*4, pos=4, summ[i], cex = 0.5, family='mono')
+        }
+        
+        output$PairwiseComparisonsGenotype = renderPlot(pairwise_summary_plot_genotype2)
+        
+
+        output$rjed <- renderReactjson({
+                reactjson(as.list(summary2))
+           })
+
         
             
         
