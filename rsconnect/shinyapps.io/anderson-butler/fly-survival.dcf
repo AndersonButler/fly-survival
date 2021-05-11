@@ -1,0 +1,10 @@
+name: fly-survival
+title:
+username:
+account: anderson-butler
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 4096282
+bundleId: 4582488
+url: https://anderson-butler.shinyapps.io/fly-survival/
+when: 1620674193.20584

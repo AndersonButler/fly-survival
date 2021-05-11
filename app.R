@@ -2,6 +2,9 @@
 # This is a Shiny web application. You can run the application by clicking
 # the 'Run App' button above.
 
+#rsconnect::deployApp('/Users/Lab/Dropbox_Scripps/WorkSoftware/Github_things/fly-survival')
+
+
 library(shiny)
 library(dplyr)
 library(survminer)
@@ -12,7 +15,7 @@ library(tidyverse)
 library(cellranger)
 library(ggplot2)
 library(listviewer)
-library(reactR)
+#library(reactR)
 
 
 #choices <- "choice 1, some other choice, and another one"
@@ -42,18 +45,18 @@ ui <- fluidPage(
             actionButton("goButton", "Go!", class = "btn-success"),
             tags$hr(),
             p('If you want a sample file to upload,',
-              'you can first download the sample data and key files', 
-              'and then try uploading them',
-              a(href = 'https://github.com/AndersonButler/fly-survival/blob/9df0fdfe61b8e16df8c8c1243f40c931ea05492f/rawdata_template_survival.xlsx', 'data_template.xlsx'), 'or',
+              'you can first download the template data and key files below', 
+              'and then try uploading them:',
+              a(href = 'https://github.com/AndersonButler/fly-survival/blob/9df0fdfe61b8e16df8c8c1243f40c931ea05492f/rawdata_template_survival.xlsx', 'data_template.xlsx'),
               a(href = 'https://github.com/AndersonButler/fly-survival/blob/9df0fdfe61b8e16df8c8c1243f40c931ea05492f/key_template_survival.xlsx', 'key_template_survival.xlsx'),
-              'files, and then try uploading them.'),
+              ''),
         ),
         # Show a plot of the generated distribution
         mainPanel(
             tableOutput("raw_table"),
             plotOutput("SurvivalPlotTreatment"),
-            plotOutput("SurvivalPlotGenotype"),
-            reactjsonOutput( "rjed" ),
+            plotOutput("SurvivalPlotGenotype")#,
+            #reactjsonOutput( "rjed" ),
             #plotOutput("PairwiseComparisonsTreatment"),
             #plotOutput("PairwiseComparisonsGenotype")
         )
@@ -174,7 +177,9 @@ server <- function(input, output) {
         }
         
         # Survival Math: Treatment
-        fit = surv_fit(Surv(Days,Dead1Excluded0) ~ Treatment, data = df.final)
+        
+        #fit = (surv_fit(Surv(Days,Dead1Excluded0) ~ Treatment, data = df.final)) ###maybe bad?
+        fit <- do.call(survfit, list(formula = Surv(Days, Dead1Excluded0 == 1) ~ Treatment, data = df.final))
         
         legend_labels = as.factor(unique(df.final$Treatment))
         
@@ -194,7 +199,7 @@ server <- function(input, output) {
             ))
         
         # Survival Math: Genotype
-        fit2 = surv_fit(Surv(Days,Dead1Excluded0) ~ Genotype, data = df.final)
+        fit2 = do.call(survfit, list(formula = Surv(Days, Dead1Excluded0 == 1) ~ Genotype, data = df.final))
         
         legend_labels2 = as.factor(unique(df.final$Genotype))
         
@@ -239,21 +244,13 @@ server <- function(input, output) {
         output$PairwiseComparisonsGenotype = renderPlot(pairwise_summary_plot_genotype2)
         
 
-        output$rjed <- renderReactjson({
-                reactjson(as.list(summary2))
-           })
+       # output$rjed <- renderReactjson({
+        #        reactjson(as.list(summary2))
+        #   })
 
-        
-            
-        
-        
         
         
     })
-    
-
-
-    
 }
 
 # Run the application 
