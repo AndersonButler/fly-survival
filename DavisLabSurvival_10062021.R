@@ -131,9 +131,10 @@ library(dplyr)
 library(survminer)
 library(survival)
 
+
 fit = surv_fit(Surv(Days,Dead1Excluded0) ~ Treatment, data = df.final)
 
-legend_labels = as.factor(unique(df.final$Treatment))
+
 
 ggsurvplot(fit, data = df.final,
            title = "Survival Curves: Treatment",
@@ -141,10 +142,10 @@ ggsurvplot(fit, data = df.final,
            pval = TRUE, pval.method = TRUE,    # Add p-value &  method name
            surv.median.line = "hv",            # Add median survival lines
            legend.title = "TREATMENT",               # Change legend titles
-           legend.labs = legend_labels,  # Change legend labels
+           #legend.labs = legend_labels,  # Change legend labels
            palette = "Pastel1",                    # Use JCO journal color palette
-           risk.table = F,                  # Add No at risk table
-           cumevents = F,                   # Add cumulative No of events table
+           risk.table = T,                  # Add No at risk table
+           cumevents = T,                   # Add cumulative No of events table
            tables.height = 0.15,               # Specify tables height
            tables.theme = theme_cleantable(),  # Clean theme for tables
            tables.y.text = FALSE               # Hide tables y axis text
@@ -166,7 +167,7 @@ ggsurvplot(fit, data = df.final,
            pval = TRUE, pval.method = TRUE,    # Add p-value &  method name
            surv.median.line = "hv",            # Add median survival lines
            legend.title = "GENOTYPE",               # Change legend titles
-           legend.labs = legend_labels,  # Change legend labels
+           #legend.labs = legend_labels,  # Change legend labels
            palette = "Pastel1",                    # Use JCO journal color palette
            risk.table = F,                  # Add No at risk table
            cumevents = F,                   # Add cumulative No of events table
@@ -174,6 +175,33 @@ ggsurvplot(fit, data = df.final,
            tables.theme = theme_cleantable(),  # Clean theme for tables
            tables.y.text = FALSE               # Hide tables y axis text
 )
+
+## -------------------------------------------------------------------------------------------------
+library(dplyr)
+library(survminer)
+library(survival)
+df.final$combined_treatment_group = paste(df.final$Genotype,df.final$Treatment)
+
+fit = surv_fit(Surv(Days,Dead1Excluded0) ~ combined_treatment_group, data = df.final)
+
+legend_labels = as.factor(unique(df.final$combined_treatment_group))
+
+ggsurvplot(fit, data = df.final,
+           title = "Survival Curves: Genotype",
+           conf.int = TRUE,
+           pval = TRUE, pval.method = TRUE,    # Add p-value &  method name
+           surv.median.line = "hv",            # Add median survival lines
+           legend.title = "GENOTYPE",               # Change legend titles
+           #legend.labs = legend_labels,  # Change legend labels
+           palette = "Pastel1",                    # Use JCO journal color palette
+           risk.table = F,                  # Add No at risk table
+           cumevents = F,                   # Add cumulative No of events table
+           tables.height = 0.15,               # Specify tables height
+           tables.theme = theme_cleantable(),  # Clean theme for tables
+           tables.y.text = FALSE               # Hide tables y axis text
+)
+
+
 
 
 ## -------------------------------------------------------------------------------------------------
@@ -209,7 +237,9 @@ my_results = my_results + for (i in seq_along(summ)) {
 
 ## I think it picks whatever the first condition is for each column as the reference by default. Let me see if I can change this by using factors...
 df.final2 = df.final
-df.final2$Treatment = factor(df.final2$Treatment, levels = c("DMSO","DRUG"))
+df.final2$Treatment = factor(df.final2$Treatment, levels = c("Non Perm","Perm"))
+df.final2$Genotype = factor(df.final2$Genotype, levels = c("MitoGFP/+ ; TubGal80ts/D42-Gal4","MitoGFP/+ ; D42Gal4/+","G298S/MitoGFP ; TubGal80ts/D42-Gal4"))
+
 
 library(survival)
 res.cox <- coxph(Surv(Days, Dead1Excluded0) ~ Genotype + Treatment, data =  df.final2)
@@ -219,4 +249,3 @@ res.cox <- coxph(Surv(Days, Dead1Excluded0) ~ Genotype + Treatment, data =  df.f
 #                    individual.curves = TRUE)
 
 ggforest(res.cox)
-
