@@ -201,6 +201,8 @@ ggsurvplot(fit, data = df.final,
            tables.y.text = FALSE               # Hide tables y axis text
 )
 
+summary(fit)
+
 
 
 
