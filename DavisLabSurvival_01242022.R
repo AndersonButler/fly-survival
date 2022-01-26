@@ -235,6 +235,74 @@ my_results = my_results + for (i in seq_along(summ)) {
             }
 
 
+
+
+## -------------------------------------------------------------------------------------------------
+#But also make a 2nd table with the same headings for HEALTHSPAN TABLE, 
+#in which we use only the data to the half-life (of the longest living group, drug or no-drug), to calculate the statistics.
+
+# Fit a survival curve based on the entire data set, similar to above
+df.final$combined_treatment_group = paste(df.final$Genotype,df.final$Treatment)
+fit = surv_fit(Surv(Days,Dead1Excluded0) ~ combined_treatment_group, data = df.final)
+legend_labels = as.factor(unique(df.final$combined_treatment_group))
+
+# Find the longest median lifespan from the two treatment groups
+surv_medians = surv_median(fit,combine=F)
+max_median_life_span = max(surv_medians$median)
+
+# Select only the data from up to the median life span (df.early_to_mid_life_survival) as is, and censor the remainder of the data
+df.early_to_mid_life_survival = df.final[df.final$Days<=max_median_life_span,]
+df.censored_by_cutoff = df.final[df.final$Days>max_median_life_span,]
+df.censored_by_cutoff$Dead1Excluded0 = 0 # all censored
+df.censored_by_cutoff$Days = 31 #all censored on day 31
+df.final2 = rbind(df.early_to_mid_life_survival,df.censored_by_cutoff)
+
+# Fit a new survival object to the early life data, without censored flies from later in life
+df.early_to_mid_life_survival$combined_treatment_group = paste(df.early_to_mid_life_survival$Genotype,df.early_to_mid_life_survival$Treatment)
+fit = surv_fit(Surv(Days,Dead1Excluded0) ~ combined_treatment_group, data = df.early_to_mid_life_survival)
+legend_labels = as.factor(unique(df.early_to_mid_life_survival$combined_treatment_group))
+
+# ggsurvplot(fit, data = df.early_to_mid_life_survival,
+#            title = "Survival Curves: Genotype",
+#            subtitle = "Early to middle lifespan survival",
+#            conf.int = TRUE,
+#            pval = TRUE, pval.method = TRUE,    # Add p-value &  method name
+#            surv.median.line = NULL,            # Add median survival lines
+#            legend.title = "GENOTYPE",               # Change legend titles
+#            #legend.labs = legend_labels,  # Change legend labels
+#            palette = "Pastel1",                    # Use JCO journal color palette
+#            risk.table = F,                  # Add No at risk table
+#            cumevents = F,                   # Add cumulative No of events table
+#            tables.height = 0.15,               # Specify tables height
+#            tables.theme = theme_cleantable(),  # Clean theme for tables
+#            tables.y.text = FALSE               # Hide tables y axis text
+# )
+
+# Fit a new survival object to the early life data, with censored flies from later in life
+df.final2$combined_treatment_group = paste(df.final2$Genotype,df.final2$Treatment)
+fit = surv_fit(Surv(Days,Dead1Excluded0) ~ combined_treatment_group, data = df.final2)
+legend_labels = as.factor(unique(df.final2$combined_treatment_group))
+
+ggsurvplot(fit, data = df.final2,
+           title = "Survival Curves: Genotype",
+           subtitle = "Early to middle lifespan survival",
+           conf.int = TRUE,
+           pval = TRUE, pval.method = TRUE,    # Add p-value &  method name
+           surv.median.line = "hv",            # Add median survival lines
+           legend.title = "GENOTYPE",               # Change legend titles
+           #legend.labs = legend_labels,  # Change legend labels
+           palette = "Pastel1",                    # Use JCO journal color palette
+           risk.table = F,                  # Add No at risk table
+           cumevents = F,                   # Add cumulative No of events table
+           tables.height = 0.15,               # Specify tables height
+           tables.theme = theme_cleantable(),  # Clean theme for tables
+           tables.y.text = FALSE               # Hide tables y axis text
+)
+
+
+
+
+
 ## -------------------------------------------------------------------------------------------------
 # Data preparation and computing cox model
 
@@ -252,4 +320,12 @@ res.cox <- coxph(Surv(Days, Dead1Excluded0) ~ Genotype + Treatment, data =  df.f
 #                    individual.curves = TRUE)
 
 ggforest(res.cox)
+
+
+
+
+
+
+
+
 
