@@ -131,10 +131,19 @@ write.csv(df.final,my_file_name)
 library(dplyr)
 library(survminer)
 library(survival)
-
+library(ggokabeito)
+library(wesanderson)
 
 fit = surv_fit(Surv(Days,Dead1Excluded0) ~ Treatment, data = df.final)
 
+safe_colorblind_palette <- c("#88CCEE", "#CC6677", "#DDCC77", "#117733", "#332288", "#AA4499", 
+                             "#44AA99", "#999933", "#882255", "#661100", "#6699CC", "#888888")
+scales::show_col(safe_colorblind_palette)
+
+okabe_ito_palette = ggokabeito::palette_okabe_ito()
+scales::show_col(okabe_ito_palette)
+
+my_palette = wes_palette("Darjeeling1")
 
 
 ggsurvplot(fit, data = df.final,
@@ -144,7 +153,7 @@ ggsurvplot(fit, data = df.final,
            surv.median.line = "hv",            # Add median survival lines
            legend.title = "TREATMENT",               # Change legend titles
            #legend.labs = legend_labels,  # Change legend labels
-           palette = "Pastel1",                    # Use JCO journal color palette
+           palette = okabe_ito_palette,                    # Use JCO journal color palette
            risk.table = T,                  # Add No at risk table
            cumevents = T,                   # Add cumulative No of events table
            tables.height = 0.15,               # Specify tables height
@@ -169,7 +178,7 @@ ggsurvplot(fit, data = df.final,
            surv.median.line = "hv",            # Add median survival lines
            legend.title = "GENOTYPE",               # Change legend titles
            #legend.labs = legend_labels,  # Change legend labels
-           palette = "Pastel1",                    # Use JCO journal color palette
+           palette = okabe_ito_palette,                    # Use JCO journal color palette
            risk.table = F,                  # Add No at risk table
            cumevents = F,                   # Add cumulative No of events table
            tables.height = 0.15,               # Specify tables height
@@ -194,7 +203,7 @@ ggsurvplot(fit, data = df.final,
            surv.median.line = "hv",            # Add median survival lines
            legend.title = "GENOTYPE",               # Change legend titles
            #legend.labs = legend_labels,  # Change legend labels
-           palette = "Pastel1",                    # Use JCO journal color palette
+           palette = okabe_ito_palette,                    # Use JCO journal color palette
            risk.table = F,                  # Add No at risk table
            cumevents = F,                   # Add cumulative No of events table
            tables.height = 0.15,               # Specify tables height
@@ -270,13 +279,20 @@ legend_labels = as.factor(unique(df.early_to_mid_life_survival$combined_treatmen
 #            surv.median.line = NULL,            # Add median survival lines
 #            legend.title = "GENOTYPE",               # Change legend titles
 #            #legend.labs = legend_labels,  # Change legend labels
-#            palette = "Pastel1",                    # Use JCO journal color palette
+#            palette = okabe_ito_palette,                    # Use JCO journal color palette
 #            risk.table = F,                  # Add No at risk table
 #            cumevents = F,                   # Add cumulative No of events table
 #            tables.height = 0.15,               # Specify tables height
 #            tables.theme = theme_cleantable(),  # Clean theme for tables
 #            tables.y.text = FALSE               # Hide tables y axis text
 # )
+
+
+# We are primarily interested in early life survival data, as this is the only period during when ALS or other neurodegenerative disease flies will be at risk
+# Thus, we are considering the effect of the drug only on survival during the first half of life, as defined by the median survival of the longer of the two treatment groups
+# The code below considers every fly that survived longer than the median lifespan to be censored, even if data collection continued past this date.
+
+
 
 # Fit a new survival object to the early life data, with censored flies from later in life
 df.final2$combined_treatment_group = paste(df.final2$Genotype,df.final2$Treatment)
@@ -291,7 +307,7 @@ ggsurvplot(fit, data = df.final2,
            surv.median.line = "hv",            # Add median survival lines
            legend.title = "GENOTYPE",               # Change legend titles
            #legend.labs = legend_labels,  # Change legend labels
-           palette = "Pastel1",                    # Use JCO journal color palette
+           palette = okabe_ito_palette,                    # Use JCO journal color palette
            risk.table = F,                  # Add No at risk table
            cumevents = F,                   # Add cumulative No of events table
            tables.height = 0.15,               # Specify tables height
