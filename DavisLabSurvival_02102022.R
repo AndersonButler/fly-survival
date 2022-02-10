@@ -219,7 +219,7 @@ summary(fit)
 ## -------------------------------------------------------------------------------------------------
 # And let's try to print the pairwise comparisons directly too:
 res <- pairwise_survdiff(Surv(Days, Dead1Excluded0) ~ Treatment,
-                         data = df.final)
+                         data = df.final, p.adjust.method="holm")
 res
 
 summ = capture.output(res)
@@ -229,7 +229,7 @@ for (i in seq_along(summ)) {
 }
 
 res <- pairwise_survdiff(Surv(Days, Dead1Excluded0) ~ Genotype,
-                         data = df.final)
+                         data = df.final,  p.adjust.method="holm")
 res
 
 summ = capture.output(res)
@@ -316,7 +316,7 @@ ggsurvplot(fit, data = df.final2,
 )
 
 res <- pairwise_survdiff(Surv(Days, Dead1Excluded0) ~ Genotype,
-                         data = df.final)
+                         data = df.final, p.adjust.method="holm")
 res
 
 summ = capture.output(res)
