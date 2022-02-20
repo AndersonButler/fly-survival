@@ -319,7 +319,7 @@ ggsurvplot(fit, data = df.final2,
 
 # Pairwise comparisons by genotype
 res <- pairwise_survdiff(Surv(Days, Dead1Excluded0) ~ Genotype,
-                         data = df.final, p.adjust.method="holm")
+                         data = df.final2, p.adjust.method="holm")
 res
 
 summ = capture.output(res)
@@ -335,7 +335,7 @@ for (i in seq_along(summ)) {
 
 # Pairwise comparisons by drug
 res <- pairwise_survdiff(Surv(Days, Dead1Excluded0) ~ Treatment,
-                         data = df.final, p.adjust.method="holm")
+                         data = df.final2, p.adjust.method="holm")
 res
 
 summ = capture.output(res)
