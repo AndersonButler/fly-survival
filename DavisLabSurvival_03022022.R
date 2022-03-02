@@ -315,7 +315,7 @@ ggsurvplot(fit, data = df.final2,
            tables.height = 0.15,               # Specify tables height
            tables.theme = theme_cleantable(),  # Clean theme for tables
            tables.y.text = FALSE               # Hide tables y axis text
-)+ guides(colour = guide_legend(nrow = 4))
+) + guides(colour = guide_legend(nrow = 4))
 
 # Pairwise comparisons by genotype
 res <- pairwise_survdiff(Surv(Days, Dead1Excluded0) ~ Genotype,
@@ -359,6 +359,8 @@ for (i in seq_along(summ)) {
 # df.final2$Treatment = factor(df.final2$Treatment, levels = c("Non Perm","Perm"))
 # df.final2$Genotype = factor(df.final2$Genotype, levels = c("MitoGFP/+ ; TubGal80ts/D42-Gal4","MitoGFP/+ ; D42Gal4/+","G298S/MitoGFP ; TubGal80ts/D42-Gal4"))
 
+# Begin updates from 3/2/2022
+## I wrapped code to build a Cox model in a for loop, to keep it from breaking with experimental designs which do not include >1 Genotype and treatment
 library(survival)
 if (length(unique(df.final2$Genotype))>1 & length(unique(df.final2$Treatment))>1){
   res.cox <- coxph(Surv(Days, Dead1Excluded0) ~ Genotype + Treatment, data =  df.final2)
@@ -369,17 +371,12 @@ if (length(unique(df.final2$Genotype))>1 & length(unique(df.final2$Treatment))>1
   ggforest(res.cox)
 }
 
+## Calculating summary statistics for the combined treatment groups:
+result_summary = surv_summary(fit, data = df.final2)
+result_table = attr(result_summary, "table")
 
-
-
-
-
-
-
-
-
-
-
+library(formattable)
+formattable(result_table)
 
 
 
